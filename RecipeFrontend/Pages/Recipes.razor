@@ -1,0 +1,33 @@
+﻿@page "/recipes"
+@using RecipeFrontend.DTOs
+@using RecipeFrontend.Services
+@inject RecipeService RecipeService
+
+<h3>Recipes</h3>
+
+@if (recipes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (recipes.Count == 0)
+{
+    <p>No recipes found.</p>
+}
+else
+{
+    <ul>
+        @foreach (var recipe in recipes)
+        {
+            <li><strong>@recipe.Title</strong>: @recipe.Description</li>
+        }
+    </ul>
+}
+
+@code {
+    private List<RecipeDto>? recipes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        recipes = await RecipeService.GetAllRecipesAsync();
+    }
+}
