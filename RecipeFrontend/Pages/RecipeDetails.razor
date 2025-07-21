@@ -1,0 +1,75 @@
+﻿@page "/recipes/{id:int}"
+@using RecipeFrontend.DTOs
+@using RecipeFrontend.Services
+@inject RecipeService recipeService
+
+@if (recipe == null)
+{
+    <div class="text-center mt-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h2>@recipe.Title</h2>
+                <p class="mb-0">@recipe.Description</p>
+            </div>
+            <div class="card-body">
+                <p><strong>Category:</strong> @recipe.CategoryName</p>
+                <p><strong>Created by:</strong> @recipe.UserFullName</p>
+                <p><strong>Created at:</strong> @recipe.CreatedAt.ToString("yyyy-MM-dd")</p>
+
+                <hr />
+
+                <h4>🧂 Ingredients</h4>
+                @if (recipe.Ingredients != null && recipe.Ingredients.Any())
+                {
+                    <ul class="list-group list-group-flush mb-4">
+                        @foreach (var ingredient in recipe.Ingredients)
+                        {
+                            <li class="list-group-item">
+                                <strong>@ingredient.Name</strong> – @ingredient.Quantity
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted">No ingredients listed.</p>
+                }
+
+                <h4>📋 Steps</h4>
+                @if (recipe.Steps != null && recipe.Steps.Any())
+                {
+                    <ol class="list-group list-group-numbered">
+                        @foreach (var step in recipe.Steps.OrderBy(s => s.Order))
+                        {
+                            <li class="list-group-item">@step.Instruction</li>
+                        }
+                    </ol>
+                }
+                else
+                {
+                    <p class="text-muted">No preparation steps listed.</p>
+                }
+            </div>
+        </div>
+    </div>
+    }
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private RecipeDto? recipe;
+
+    protected override async Task OnInitializedAsync()
+    {
+        recipe = await recipeService.GetRecipeByIdAsync(id);
+    }
+}

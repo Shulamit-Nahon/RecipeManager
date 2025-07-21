@@ -17,5 +17,11 @@ namespace RecipeFrontend.Services
             var recipes = await _http.GetFromJsonAsync<List<RecipeDto>>("api/recipes");
             return recipes ?? new List<RecipeDto>();
         }
+
+        public async Task<RecipeDto?> GetRecipeByIdAsync(int id)
+        {
+            var recipe = await _http.GetFromJsonAsync<RecipeDto>($"api/recipes/{id}");
+            return recipe;
+        }
     }
 }

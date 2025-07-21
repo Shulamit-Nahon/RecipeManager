@@ -1,9 +1,8 @@
-﻿@page "/recipes"
+﻿@page "/"
 @using RecipeFrontend.DTOs
 @using RecipeFrontend.Services
-@inject RecipeService RecipeService
-
-<h3>Recipes</h3>
+@inject NavigationManager Navigation
+@inject RecipeService recipeService
 
 @if (recipes == null)
 {
@@ -18,7 +17,14 @@ else
     <ul>
         @foreach (var recipe in recipes)
         {
-            <li><strong>@recipe.Title</strong>: @recipe.Description</li>
+            <div class="card mb-3">
+                <div class="card-body">
+                     <h5 class="card-title">@recipe.Title</h5>
+                    <p class="card-text">@recipe.Description</p>
+                    <p class="card-text text-muted">By @recipe.UserFullName</p>
+                    <a class="btn btn-primary" href="/recipes/@recipe.Id">View Recipe</a>
+                </div>
+            </div>
         }
     </ul>
 }
@@ -28,6 +34,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        recipes = await RecipeService.GetAllRecipesAsync();
+        recipes = await recipeService.GetAllRecipesAsync();
     }
 }
