@@ -2,11 +2,12 @@
 @using RecipeFrontend.DTOs
 @using RecipeFrontend.Services
 @inject RecipeService recipeService
+@inject CategoryService categoryService
 @inject NavigationManager navigationManager
 
 <EditForm Model="newRecipe" OnInvalidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator/>
-    <ValidationSummary/>
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
     <div class="mb-3">
         <label class="form-label">Title</label>
@@ -17,17 +18,30 @@
         <label class="form-label">Description</label>
         <InputText class="form-control" @bind-Value="newRecipe.Description"></InputText>
     </div>
-    <div class="mb-3">
-        <label class="form-label">Category</label>
-        <InputNumber class="form-control" @bind-Value="newRecipe.CategoryId"></InputNumber>"
-    </div>
-
+    @if (categories != null && categories.Any())
+    {
+        <div class="mb-3">
+            <label class="form-label">Category</label>
+            <select class="form-select" @bind="newRecipe.CategoryId">
+                <option disabled value="0">-- Choose a category --</option>
+                @foreach (var category in categories)
+                {
+                    <option value="@category.Id">@category.Name</option>
+                }
+            </select>
+        </div>
+    }
     <button class="btn btn-primary" type="submit">Add Recipe</button>
 </EditForm>
 
 @code {
     private RecipeCreateDto newRecipe = new();
+    private List<CategoryDto>? categories;
 
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await categoryService.GetAllCategoriesAsync();
+    }
     protected async Task HandleValidSubmit()
     {
         await recipeService.AddRecipeAsync(newRecipe);
