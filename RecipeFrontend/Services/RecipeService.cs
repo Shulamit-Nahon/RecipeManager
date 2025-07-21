@@ -23,5 +23,16 @@ namespace RecipeFrontend.Services
             var recipe = await _http.GetFromJsonAsync<RecipeDto>($"api/recipes/{id}");
             return recipe;
         }
+
+        public async Task AddRecipeAsync(RecipeCreateDto newRecipe)
+        {
+            var response = await _http.PostAsJsonAsync("api/recipes", newRecipe);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                throw new ApplicationException($"Failed to add recipe: {errorMessage}");
+            }
+        }
     }
 }

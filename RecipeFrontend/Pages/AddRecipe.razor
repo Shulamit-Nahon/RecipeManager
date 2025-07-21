@@ -1,0 +1,36 @@
+﻿@page "/recipes/add"
+@using RecipeFrontend.DTOs
+@using RecipeFrontend.Services
+@inject RecipeService recipeService
+@inject NavigationManager navigationManager
+
+<EditForm Model="newRecipe" OnInvalidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+
+    <div class="mb-3">
+        <label class="form-label">Title</label>
+        <InputText class="form-control" @bind-Value="newRecipe.Title"></InputText>
+    </div>
+
+    <div>
+        <label class="form-label">Description</label>
+        <InputText class="form-control" @bind-Value="newRecipe.Description"></InputText>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Category</label>
+        <InputNumber class="form-control" @bind-Value="newRecipe.CategoryId"></InputNumber>"
+    </div>
+
+    <button class="btn btn-primary" type="submit">Add Recipe</button>
+</EditForm>
+
+@code {
+    private RecipeCreateDto newRecipe = new();
+
+    protected async Task HandleValidSubmit()
+    {
+        await recipeService.AddRecipeAsync(newRecipe);
+        navigationManager.NavigateTo("/recipes");
+    }
+}
