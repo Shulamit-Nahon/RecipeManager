@@ -14,7 +14,7 @@
         <InputText class="form-control" @bind-Value="newRecipe.Title"></InputText>
     </div>
 
-    <div>
+    <div class="mb-3">
         <label class="form-label">Description</label>
         <InputText class="form-control" @bind-Value="newRecipe.Description"></InputText>
     </div>
@@ -31,7 +31,41 @@
             </select>
         </div>
     }
-    <button class="btn btn-primary" type="submit">Add Recipe</button>
+    <div class="mb-3">
+        <label class="form-label mb-3">Ingredients</label>
+        @for (int i = 0; i < newRecipe.Ingredients.Count; i++)
+        {
+            <div class="input-group mb-2">
+                <input type="text" class="form-control" placeholder="Name"
+                       @bind="newRecipe.Ingredients[i].Name" />
+
+                <input type="text" class="form-control" placeholder="Quantity"
+                       @bind="newRecipe.Ingredients[i].Quantity" />
+
+                <button class="btn btn-outline-danger" type="button" @onclick="@(() => RemoveIngredient(i))">–</button>
+            </div>
+        }
+        <button class="btn btn-outline-primary mb-3" type="button" @onclick="AddIngredient">+ Add Ingredient</button>
+    </div>
+
+
+    <div class="mb-3">
+        <label class="form-label mb-3">Steps</label>
+        @for (int i = 0; i < newRecipe.Steps.Count; i++)
+        {
+            <div class="input-group mb-2">
+                <input type="number" class="form-control" placeholder="Order"
+                       @bind="newRecipe.Steps[i].Order" />
+
+                <input type="text" class="form-control" placeholder="Instruction"
+                       @bind="newRecipe.Steps[i].Instruction" />
+
+                <button class="btn btn-outline-danger" type="button" @onclick="@(() => RemoveStep(i))">–</button>
+            </div>
+        }
+        <button class="btn btn-outline-primary mb-3" type="button" @onclick="AddStep">+ Add Step</button>
+    </div>
+    <button class="btn btn-primary mb-3" type="submit">Add Recipe</button>
 </EditForm>
 
 @code {
@@ -41,10 +75,36 @@
     protected override async Task OnInitializedAsync()
     {
         categories = await categoryService.GetAllCategoriesAsync();
+
+        newRecipe.Ingredients = new List<IngredientDto> { new IngredientDto() };
+        newRecipe.Steps = new List<StepDto> { new StepDto() };
     }
     protected async Task HandleValidSubmit()
     {
         await recipeService.AddRecipeAsync(newRecipe);
         navigationManager.NavigateTo("/recipes");
+    }
+
+    private void AddIngredient()
+    {
+        newRecipe.Ingredients.Add(new IngredientDto());
+    }
+
+    private void RemoveIngredient(int index)
+    {
+        if (newRecipe.Ingredients.Count > 1)
+        {
+            newRecipe.Ingredients.RemoveAt(index);
+        }
+    }
+
+    private void AddStep()
+    {
+        newRecipe.Steps.Add(new StepDto());
+    }
+
+    private void RemoveStep(int index)
+    {
+        newRecipe.Steps.RemoveAt(index);
     }
 }
