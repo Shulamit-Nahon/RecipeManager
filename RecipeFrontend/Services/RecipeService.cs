@@ -26,7 +26,35 @@ namespace RecipeFrontend.Services
 
         public async Task AddRecipeAsync(RecipeCreateDto newRecipe)
         {
-            var response = await _http.PostAsJsonAsync("api/recipes", newRecipe);
+
+            var form = new MultipartFormDataContent();
+
+            form.Add(new StringContent(newRecipe.Title), "Title");
+            form.Add(new StringContent(newRecipe.Description), "Description");
+            form.Add(new StringContent(newRecipe.CategoryId.ToString()), "CategoryId");
+            form.Add(new StringContent("1"), "UserId");
+
+            //Add ingredients to the form
+            if (newRecipe.Ingredients != null)
+            {
+                for (int i = 0; i< newRecipe.Ingredients.Count; i++)
+                {
+                    form.Add(new StringContent(newRecipe.Ingredients[i].Name), $"Ingredients[{i}].Name");
+                    form.Add(new StringContent(newRecipe.Ingredients[i].Quantity), $"Ingredients[{i}].Quantity");
+                }
+            }
+
+            //Add steps to the form
+            if (newRecipe.Steps != null)
+            {
+                for (int i = 0; i < newRecipe.Steps.Count; i++)
+                {
+                    form.Add(new StringContent(newRecipe.Steps[i].Order.ToString()), $"Ingredients[{i}].Order");
+                    form.Add(new StringContent(newRecipe.Steps[i].Instruction), $"Ingredients[{i}].Instruction");
+                }
+            }
+
+            var response = await _http.PostAsync("api/recipes", form);
             
             if (!response.IsSuccessStatusCode)
             {

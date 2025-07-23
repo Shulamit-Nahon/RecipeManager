@@ -5,7 +5,7 @@
 @inject CategoryService categoryService
 @inject NavigationManager navigationManager
 
-<EditForm Model="newRecipe" OnInvalidSubmit="HandleValidSubmit">
+<EditForm Model="newRecipe" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -33,23 +33,31 @@
     }
     <div class="mb-3">
         <label class="form-label mb-3">Ingredients</label>
-        @for (int i = 0; i < newRecipe.Ingredients.Count; i++)
+        @if (newRecipe.Ingredients != null && newRecipe.Ingredients.Count > 0)
         {
-            <div class="input-group mb-2">
-                <input type="text" class="form-control" placeholder="Name"
-                       @bind="newRecipe.Ingredients[i].Name" />
+            @for (int i = 0; i < newRecipe.Ingredients.Count; i++)
+            {
+                var index = i;
+                <div class="input-group mb-2">
+                    <InputText class="form-control" placeholder="Name"
+                               @bind-Value="newRecipe.Ingredients[index].Name" />
 
-                <input type="text" class="form-control" placeholder="Quantity"
-                       @bind="newRecipe.Ingredients[i].Quantity" />
+                    <InputText class="form-control" placeholder="Quantity"
+                               @bind-Value="newRecipe.Ingredients[index].Quantity" />
 
-                <button class="btn btn-outline-danger" type="button" @onclick="@(() => RemoveIngredient(i))">–</button>
-            </div>
+                    <button class="btn btn-outline-danger" type="button"
+                            @onclick="@(() => RemoveIngredient(index))">
+                        –
+                    </button>
+                </div>
+            }
+
         }
         <button class="btn btn-outline-primary mb-3" type="button" @onclick="AddIngredient">+ Add Ingredient</button>
     </div>
 
 
-    <div class="mb-3">
+    @* <div class="mb-3">
         <label class="form-label mb-3">Steps</label>
         @for (int i = 0; i < newRecipe.Steps.Count; i++)
         {
@@ -64,8 +72,8 @@
             </div>
         }
         <button class="btn btn-outline-primary mb-3" type="button" @onclick="AddStep">+ Add Step</button>
-    </div>
-    <button class="btn btn-primary mb-3" type="submit">Add Recipe</button>
+    </div>*@
+    <button class="btn btn-primary mb-3" type="submit">Add Recipe</button> 
 </EditForm>
 
 @code {
@@ -82,7 +90,7 @@
     protected async Task HandleValidSubmit()
     {
         await recipeService.AddRecipeAsync(newRecipe);
-        navigationManager.NavigateTo("/recipes");
+        navigationManager.NavigateTo("/");
     }
 
     private void AddIngredient()
@@ -92,7 +100,8 @@
 
     private void RemoveIngredient(int index)
     {
-        if (newRecipe.Ingredients.Count > 1)
+        if (index >= 0 && index < newRecipe.Ingredients.Count)
+        
         {
             newRecipe.Ingredients.RemoveAt(index);
         }
@@ -105,6 +114,9 @@
 
     private void RemoveStep(int index)
     {
-        newRecipe.Steps.RemoveAt(index);
+        if (index >= 0 && index < newRecipe.Steps.Count)
+        {
+            newRecipe.Steps.RemoveAt(index);
+        }
     }
 }
