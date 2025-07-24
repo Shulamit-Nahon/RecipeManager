@@ -2,6 +2,9 @@
 @using RecipeFrontend.DTOs
 @using RecipeFrontend.Services
 @inject RecipeService recipeService
+@inject NavigationManager navigationManager
+@inject IJSRuntime JSRuntime
+
 
 @if (recipe == null)
 {
@@ -59,19 +62,29 @@ else
                 }
             </div>
         </div>
-        <a class="btn btn-primary" href="/recipes/@recipe.Id">View Recipe</a>
 
     </div>
-    }
+
+    <a class="btn btn-primary" @onclick="() => DeleteRecipe(Id)">Delete Recipe</a>
+
+}
 
 @code {
     [Parameter]
-    public int id { get; set; }
+    public int Id { get; set; }
 
     private RecipeDto? recipe;
 
     protected override async Task OnInitializedAsync()
     {
-        recipe = await recipeService.GetRecipeByIdAsync(id);
+        recipe = await recipeService.GetRecipeByIdAsync(Id);
+    }
+    private async Task DeleteRecipe(int id)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this recipe?");
+        if (!confirmed) return;
+
+        await recipeService.DeleteRecipe(Id);
+        navigationManager.NavigateTo("/");
     }
 }

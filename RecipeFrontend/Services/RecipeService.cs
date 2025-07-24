@@ -62,5 +62,15 @@ namespace RecipeFrontend.Services
                 throw new ApplicationException($"Failed to add recipe: {errorMessage}");
             }
         }
+
+        public async Task DeleteRecipe(int id)
+        {
+            var response = await _http.DeleteAsync($"api/recipes/{id}");
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                throw new ApplicationException($"Failed to delete recipe: {errorMessage}");
+            }
+        }
     }
 }
