@@ -1,4 +1,5 @@
-﻿using RecipeFrontend.DTOs;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using RecipeFrontend.DTOs;
 using System.Net.Http.Json;
 
 namespace RecipeFrontend.Services
@@ -24,7 +25,7 @@ namespace RecipeFrontend.Services
             return recipe;
         }
 
-        public async Task AddRecipeAsync(RecipeCreateDto newRecipe)
+        public async Task AddRecipeAsync(RecipeCreateDto newRecipe, IBrowserFile? selectedImage)
         {
 
             var form = new MultipartFormDataContent();
@@ -52,6 +53,11 @@ namespace RecipeFrontend.Services
                     form.Add(new StringContent(newRecipe.Steps[i].Order.ToString()), $"Ingredients[{i}].Order");
                     form.Add(new StringContent(newRecipe.Steps[i].Instruction), $"Ingredients[{i}].Instruction");
                 }
+            }
+            if (selectedImage != null)
+            {
+                var stream = selectedImage.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+                form.Add(new StreamContent(stream), "Image", selectedImage.Name);
             }
 
             var response = await _http.PostAsync("api/recipes", form);

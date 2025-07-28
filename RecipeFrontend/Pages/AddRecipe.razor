@@ -73,12 +73,17 @@
         }
         <button class="btn btn-outline-primary mb-3" type="button" @onclick="AddStep">+ Add Step</button>
     </div>
+    <div class="mb-3">
+        <InputFile OnChange="HandleFileSelected" />
+    </div>
+
     <button class="btn btn-primary mb-3" type="submit">Add Recipe</button> 
 </EditForm>
 
 @code {
     private RecipeCreateDto newRecipe = new();
     private List<CategoryDto>? categories;
+    IBrowserFile? selectedImage;
 
     protected override async Task OnInitializedAsync()
     {
@@ -89,7 +94,7 @@
     }
     protected async Task HandleValidSubmit()
     {
-        await recipeService.AddRecipeAsync(newRecipe);
+        await recipeService.AddRecipeAsync(newRecipe, selectedImage);
         navigationManager.NavigateTo("/");
     }
 
@@ -101,7 +106,7 @@
     private void RemoveIngredient(int index)
     {
         if (index >= 0 && index < newRecipe.Ingredients.Count)
-        
+
         {
             newRecipe.Ingredients.RemoveAt(index);
         }
@@ -119,4 +124,10 @@
             newRecipe.Steps.RemoveAt(index);
         }
     }
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedImage = e.File;
+    }
+
 }

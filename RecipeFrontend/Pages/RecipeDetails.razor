@@ -23,10 +23,11 @@ else
                 <p class="mb-0">@recipe.Description</p>
             </div>
             <div class="card-body">
-                <p><strong>Category:</strong> @recipe.CategoryName</p>
-                <p><strong>Created by:</strong> @recipe.UserFullName</p>
-                <p><strong>Created at:</strong> @recipe.CreatedAt.ToString("yyyy-MM-dd")</p>
-
+                <div class="mb-3 text-muted small">
+                    <span class="me-3"><strong>Category:</strong> @recipe.CategoryName</span>
+                    <span class="me-3"><strong>By:</strong> @recipe.UserFullName</span>
+                    <span><strong>Created:</strong> @recipe.CreatedAt.ToString("yyyy-MM-dd")</span>
+                </div>
                 <hr />
 
                 <h4>🧂 Ingredients</h4>
@@ -49,7 +50,7 @@ else
                 <h4>📋 Steps</h4>
                 @if (recipe.Steps != null && recipe.Steps.Any())
                 {
-                    <ol class="list-group list-group-numbered">
+                    <ol class="list-group">
                         @foreach (var step in recipe.Steps.OrderBy(s => s.Order))
                         {
                             <li class="list-group-item">@step.Instruction</li>
@@ -60,12 +61,14 @@ else
                 {
                     <p class="text-muted">No preparation steps listed.</p>
                 }
+                <div class="d-flex justify-content-end">
+                    <a class="btn btn-outline-danger" @onclick="() => DeleteRecipe(recipe.Id)">Delete Recipe</a>
+                </div>
             </div>
         </div>
 
     </div>
 
-    <a class="btn btn-primary" @onclick="() => DeleteRecipe(Id)">Delete Recipe</a>
 
 }
 
