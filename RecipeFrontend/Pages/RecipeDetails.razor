@@ -61,13 +61,14 @@ else
                 {
                     <p class="text-muted">No preparation steps listed.</p>
                 }
-                <div class="d-flex justify-content-end">
-                    <a class="btn btn-outline-danger" @onclick="() => DeleteRecipe(recipe.Id)">Delete Recipe</a>
+                <!-- 🔘 Update & Delete Buttons -->
+                <div class="d-flex justify-content-center gap-3 my-4">
+                    <a class="btn btn-sm btn-primary px-4 py-2 w-25" href="/edit-recipe/@recipe.Id">Edit Recipe</a>
+                    <button class="btn btn-sm btn-danger px-4 py-2 w-25">Delete Recipe</button>
                 </div>
             </div>
+            </div>
         </div>
-
-    </div>
 
 
 }
