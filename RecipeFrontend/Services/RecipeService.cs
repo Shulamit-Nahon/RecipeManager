@@ -50,8 +50,8 @@ namespace RecipeFrontend.Services
             {
                 for (int i = 0; i < newRecipe.Steps.Count; i++)
                 {
-                    form.Add(new StringContent(newRecipe.Steps[i].Order.ToString()), $"Ingredients[{i}].Order");
-                    form.Add(new StringContent(newRecipe.Steps[i].Instruction), $"Ingredients[{i}].Instruction");
+                    form.Add(new StringContent(newRecipe.Steps[i].Order.ToString()), $"Steps[{i}].Order");
+                    form.Add(new StringContent(newRecipe.Steps[i].Instruction), $"Steps[{i}].Instruction");
                 }
             }
             if (selectedImage != null)

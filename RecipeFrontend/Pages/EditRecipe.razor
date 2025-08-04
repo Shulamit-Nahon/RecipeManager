@@ -1,0 +1,54 @@
+﻿@page "/edit-recipe/{Id:int}"
+@using RecipeFrontend.DTOs
+@using RecipeFrontend.Services
+@inject RecipeService recipeService
+@inject NavigationManager navigationManager
+
+<h3>Edit Recipe</h3>
+
+<EditForm Model="editRecipe" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Title</label>
+        <InputText class="form-control" @bind-Value="editRecipe.Title" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Description</label>
+        <InputTextArea class="form-control" @bind-Value="editRecipe.Description" />
+    </div>
+
+    <!-- Category, Ingredients, Steps – add more fields like your Add page -->
+
+    <button class="btn btn-primary" type="submit">Update Recipe</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private RecipeUpdateDTO editRecipe = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var existing = await recipeService.GetRecipeByIdAsync(Id);
+        if (existing != null)
+        {
+            editRecipe = new RecipeUpdateDTO
+            {
+                Title = existing.Title,
+                Description = existing.Description,
+                //CategoryId = existing.CategoryName,
+                // Map Ingredients, Steps if needed
+            };
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+       // await recipeService.UpdateRecipeAsync(Id, editRecipe);
+        navigationManager.NavigateTo("/recipes");
+    }
+}
