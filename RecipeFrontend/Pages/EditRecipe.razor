@@ -2,53 +2,149 @@
 @using RecipeFrontend.DTOs
 @using RecipeFrontend.Services
 @inject RecipeService recipeService
+@inject CategoryService categoryService
 @inject NavigationManager navigationManager
 
-<h3>Edit Recipe</h3>
-
-<EditForm Model="editRecipe" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div class="mb-3">
-        <label class="form-label">Title</label>
-        <InputText class="form-control" @bind-Value="editRecipe.Title" />
+@if (editRecipe == null || categories == null)
+{
+    <div class="text-center mt-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
     </div>
+}
+else
+{
+    <EditForm Model="editRecipe" OnValidSubmit="UpdateRecipe">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="mb-4">
+            <div class="mb-3">
+                <label class="form-label">Title</label>
+                <InputText class="form-control" @bind-Value="editRecipe.Title" />
+            </div>
 
-    <div class="mb-3">
-        <label class="form-label">Description</label>
-        <InputTextArea class="form-control" @bind-Value="editRecipe.Description" />
-    </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <InputText class="form-control" @bind-Value="editRecipe.Description" />
+            </div>
 
-    <!-- Category, Ingredients, Steps – add more fields like your Add page -->
+            <div class="mb-3">
+                <label class="form-label">Category</label>
+                <InputSelect class="form-select" @bind-Value="editRecipe.CategoryId">
+                    <option disabled value="0">-- Choose a category --</option>
+                    @foreach (var category in categories)
+                    {
+                        <option value="@category.Id">@category.Name</option>
+                    }
+                </InputSelect>
+            </div>
 
-    <button class="btn btn-primary" type="submit">Update Recipe</button>
-</EditForm>
+            <div class="mb-3">
+                <label class="form-label mb-3">Ingredients</label>
+                @if (editRecipe.Ingredients != null && editRecipe.Ingredients.Count > 0)
+                {
+                    @for (int i = 0; i < editRecipe.Ingredients.Count; i++)
+                    {
+                        var index = i;
+                        <div class="d-flex gap-2 mb-2 align-items-center">
+                            <InputText class="form-control" @bind-Value="editRecipe.Ingredients[index].Name" />
+                            <InputText class="form-control" @bind-Value="editRecipe.Ingredients[index].Quantity" />
+                            <button class="btn btn-outline-danger btn-sm" type="button" @onclick="() => RemoveIngredient(index)">-</button>
+                        </div>
+                    }
+                }
+                else
+
+                {
+                    <p class="text-muted fst-italic">No ingredients listed yet. Add one below</p>
+                }
+                <button type="button" class="btn btn-sm btn-outline-primary mt-2" @onclick="AddIngredient">Add Ingredient</button>
+            </div>
+            <div class="mb-3">
+                <label class="form-label mb-3">Steps</label>
+                @if (editRecipe.Steps != null && editRecipe.Steps.Count > 0)
+                {
+                    @for (int i = 0; i < editRecipe.Steps.Count; i++)
+                    {
+                        var index = i;
+                        <div class="d-flex gap-2 mb-2 align-items-center">
+                            <span class="input-group-text">Step @editRecipe.Steps[index].Order</span>
+                            <InputText class="form-control" @bind-Value="editRecipe.Steps[index].Instruction" />
+                            <button class="btn btn-outline-danger btn-sm" type="button" @onclick="() => RemoveStep(index)">-</button>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted fst-italic">No preparation steps yet. Add one below</p>
+                }
+                <button type="button" class="btn btn-sm btn-outline-primary mt-2" @onclick="AddStep">Add Step</button>
+            </div>
+        </div>
+
+        <div class="d-flex  justify-content-center gap-3 my-4">
+            <button class="btn btn-sm btn-success px-4 py-2 w-10" type="submit">Save Changes</button>
+            <button class="btn btn-sm btn-secondary px-4 py-2 w-10" type="button" @onclick="CancelEdit">Cancel</button>
+        </div>
+    </EditForm>
+}
 
 @code {
     [Parameter]
     public int Id { get; set; }
 
-    private RecipeUpdateDTO editRecipe = new();
+    private RecipeUpdateDTO? editRecipe;
+    private List<CategoryDto>? categories;
 
     protected override async Task OnInitializedAsync()
     {
-        var existing = await recipeService.GetRecipeByIdAsync(Id);
-        if (existing != null)
+        var recipe = await recipeService.GetRecipeByIdAsync(Id);
+        categories = await categoryService.GetAllCategoriesAsync();
+
+        editRecipe = new RecipeUpdateDTO
         {
-            editRecipe = new RecipeUpdateDTO
-            {
-                Title = existing.Title,
-                Description = existing.Description,
-                //CategoryId = existing.CategoryName,
-                // Map Ingredients, Steps if needed
-            };
-        }
+            Id = recipe.Id,
+            Title = recipe.Title,
+            Description = recipe.Description,
+            //CategoryId = recipe.CategoryId,
+            Ingredients = recipe.Ingredients?
+        .Select(i => new IngredientDto { Name = i.Name, Quantity = i.Quantity })
+        .ToList() ?? new List<IngredientDto>(),
+            Steps = recipe.Steps?
+        .Select(i => new StepDto { Order = i.Order, Instruction = i.Instruction })
+        .ToList() ?? new List<StepDto>()
+        };
     }
 
-    private async Task HandleValidSubmit()
+    private async Task UpdateRecipe()
     {
-       // await recipeService.UpdateRecipeAsync(Id, editRecipe);
-        navigationManager.NavigateTo("/recipes");
+        //await recipeService.UpdateRecipeAsync(Id, editRecipe);
+        navigationManager.NavigateTo($"/recipes/{Id}");
+    }
+
+    private void AddIngredient()
+    {
+        editRecipe.Ingredients.Add(new IngredientDto());
+    }
+
+    private void RemoveIngredient(int index)
+    {
+        if (index >= 0 && index < editRecipe.Ingredients.Count)
+            editRecipe.Ingredients.RemoveAt(index);
+    }
+    private void AddStep()
+    {
+        editRecipe.Steps.Add(new StepDto());
+    }
+
+    private void RemoveStep(int index)
+    {
+        if (index >= 0 && index < editRecipe.Steps.Count)
+            editRecipe.Steps.RemoveAt(index);
+    }
+    private void CancelEdit()
+    {
+        navigationManager.NavigateTo($"/recipes/{Id}");
     }
 }

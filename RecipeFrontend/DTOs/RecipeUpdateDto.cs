@@ -8,8 +8,8 @@
         public int CategoryId { get; set; }
         public int UserId { get; set; }
 
-        public List<IngredientUpdateDto> Ingredients { get; set; } = new();
-        public List<StepUpdateDto> Steps { get; set; } = new();
+        public List<IngredientDto> Ingredients { get; set; } = new();
+        public List<StepDto> Steps { get; set; } = new();
 
         //public IFormFile? File { get; set; } // Optional replacement file
         public bool RemoveExistingFile { get; set; } = false;

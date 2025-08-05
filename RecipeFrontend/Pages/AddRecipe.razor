@@ -63,10 +63,10 @@
             @for (int i = 0; i < newRecipe.Steps.Count; i++)
             {
                 var index = i;
-                <div class="input-group mb-2">
-                    <InputNumber class="form-control" placeholder="Order"
-                               @bind-Value="newRecipe.Steps[index].Order" />
-
+                <div class="d-flex gap-2 mb-2 align-items-center">
+                    @* <InputNumber class="form-control" placeholder="Order"
+                               @bind-Value="newRecipe.Steps[index].Order" /> *@
+                    <span class="input-group-text">Step @newRecipe.Steps[index].Order</span>
                     <InputText class="form-control" placeholder="Instruction"
                                @bind-Value="newRecipe.Steps[index].Instruction" />
 
@@ -81,26 +81,10 @@
         <button class="btn btn-outline-primary mb-3" type="button" @onclick="AddStep">+ Add Step</button>
     </div>
     @* <div class="mb-3">
-        <label class="form-label mb-3">Steps</label>
-        @for (int i = 0; i < newRecipe.Steps.Count; i++)
-        {
-            <div class="input-group mb-2">
-                <input type="number" class="form-control" placeholder="Order"
-                       @bind="newRecipe.Steps[i].Order" />
-
-                <input type="text" class="form-control" placeholder="Instruction"
-                       @bind="newRecipe.Steps[i].Instruction" />
-
-                <button class="btn btn-outline-danger" type="button" @onclick="@(() => RemoveStep(i))">–</button>
-            </div>
-        }
-        <button class="btn btn-outline-primary mb-3" type="button" @onclick="AddStep">+ Add Step</button>
-    </div> *@
-    @* <div class="mb-3">
         <InputFile OnChange="HandleFileSelected" />
     </div> *@
 
-    <button class="btn btn-primary mb-3" type="submit">Add Recipe</button> 
+    <button class="btn btn-primary mb-3" type="submit">Add Recipe</button>
 </EditForm>
 
 @code {
@@ -113,7 +97,7 @@
         categories = await categoryService.GetAllCategoriesAsync();
 
         newRecipe.Ingredients = new List<IngredientDto> { new IngredientDto() };
-        newRecipe.Steps = new List<StepDto> { new StepDto() };
+        newRecipe.Steps = new List<StepDto> { new StepDto { Order = 1 } };
     }
     protected async Task HandleValidSubmit()
     {
@@ -137,7 +121,13 @@
 
     private void AddStep()
     {
-        newRecipe.Steps.Add(new StepDto());
+        int nextOrder = newRecipe.Steps.Count + 1;
+
+        newRecipe.Steps.Add(new StepDto
+        {
+            Order = nextOrder,
+            Instruction = ""
+        });
     }
 
     private void RemoveStep(int index)
@@ -145,6 +135,10 @@
         if (index >= 0 && index < newRecipe.Steps.Count)
         {
             newRecipe.Steps.RemoveAt(index);
+            for (int i = 0; i < newRecipe.Steps.Count; i++)
+            {
+                newRecipe.Steps[i].Order = i + 1;
+            }
         }
     }
 
