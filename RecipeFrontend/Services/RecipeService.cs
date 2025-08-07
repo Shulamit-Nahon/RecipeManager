@@ -78,5 +78,50 @@ namespace RecipeFrontend.Services
                 throw new ApplicationException($"Failed to delete recipe: {errorMessage}");
             }
         }
+
+        public async Task UpdateRecipeAsync(int id, RecipeUpdateDTO updateRecipe)
+        {
+
+            var form = new MultipartFormDataContent();
+
+            form.Add(new StringContent(updateRecipe.Title), "Title");
+            form.Add(new StringContent(updateRecipe.Description), "Description");
+            form.Add(new StringContent(updateRecipe.CategoryId.ToString()), "CategoryId");
+            form.Add(new StringContent("1"), "UserId");
+
+            //Add ingredients to the form
+            if (updateRecipe.Ingredients != null)
+            {
+                for (int i = 0; i < updateRecipe.Ingredients.Count; i++)
+                {
+                    form.Add(new StringContent(updateRecipe.Ingredients[i].Name), $"Ingredients[{i}].Name");
+                    form.Add(new StringContent(updateRecipe.Ingredients[i].Quantity), $"Ingredients[{i}].Quantity");
+                }
+            }
+
+            //Add steps to the form
+            if (updateRecipe.Steps != null)
+            {
+                for (int i = 0; i < updateRecipe.Steps.Count; i++)
+                {
+                    form.Add(new StringContent(updateRecipe.Steps[i].Order.ToString()), $"Steps[{i}].Order");
+                    form.Add(new StringContent(updateRecipe.Steps[i].Instruction), $"Steps[{i}].Instruction");
+                }
+            }
+            //if (selectedImage != null)
+            //{
+            //    var stream = selectedImage.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+            //    form.Add(new StreamContent(stream), "Image", selectedImage.Name);
+            //}
+
+            var response = await _http.PutAsync($"api/recipes/{id}", form);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                throw new ApplicationException($"Failed to update recipe: {errorMessage}");
+            }
+        }
+        
     }
 }

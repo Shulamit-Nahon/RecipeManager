@@ -107,19 +107,19 @@ else
             Id = recipe.Id,
             Title = recipe.Title,
             Description = recipe.Description,
-            //CategoryId = recipe.CategoryId,
+            CategoryId =3,
             Ingredients = recipe.Ingredients?
-        .Select(i => new IngredientDto { Name = i.Name, Quantity = i.Quantity })
-        .ToList() ?? new List<IngredientDto>(),
+                .Select(i => new IngredientDto { Name = i.Name, Quantity = i.Quantity })
+                .ToList() ?? new List<IngredientDto>(),
             Steps = recipe.Steps?
-        .Select(i => new StepDto { Order = i.Order, Instruction = i.Instruction })
-        .ToList() ?? new List<StepDto>()
+                .Select(i => new StepDto { Order = i.Order, Instruction = i.Instruction })
+                .ToList() ?? new List<StepDto>()
         };
     }
 
     private async Task UpdateRecipe()
     {
-        //await recipeService.UpdateRecipeAsync(Id, editRecipe);
+        await recipeService.UpdateRecipeAsync(Id, editRecipe);
         navigationManager.NavigateTo($"/recipes/{Id}");
     }
 
@@ -133,15 +133,27 @@ else
         if (index >= 0 && index < editRecipe.Ingredients.Count)
             editRecipe.Ingredients.RemoveAt(index);
     }
+
     private void AddStep()
     {
-        editRecipe.Steps.Add(new StepDto());
+        int nextOrder = editRecipe.Steps.Count + 1;
+        editRecipe.Steps.Add(new StepDto
+        {
+            Order = nextOrder,
+            Instruction = ""
+        });
     }
 
     private void RemoveStep(int index)
     {
         if (index >= 0 && index < editRecipe.Steps.Count)
+        {
             editRecipe.Steps.RemoveAt(index);
+            for (int i = 0; i < editRecipe.Steps.Count; i++)
+            {
+                editRecipe.Steps[i].Order = i + 1;
+            }
+        }
     }
     private void CancelEdit()
     {

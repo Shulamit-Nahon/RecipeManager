@@ -7,16 +7,18 @@
 
 <EditForm Model="newRecipe" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
-    <ValidationSummary />
 
     <div class="mb-3">
         <label class="form-label">Title</label>
         <InputText class="form-control" @bind-Value="newRecipe.Title"></InputText>
+        <ValidationMessage For="@(() => newRecipe.Title)" />
     </div>
 
     <div class="mb-3">
         <label class="form-label">Description</label>
         <InputText class="form-control" @bind-Value="newRecipe.Description"></InputText>
+        <ValidationMessage For="@(() => newRecipe.Description)" />
+
     </div>
     @if (categories != null && categories.Any())
     {
@@ -28,7 +30,11 @@
                 {
                     <option value="@category.Id">@category.Name</option>
                 }
+
             </select>
+            <ValidationMessage For="@(() => newRecipe.CategoryId)" />
+
+
         </div>
     }
     <div class="mb-3">
@@ -50,9 +56,14 @@
                         –
                     </button>
                 </div>
+                <div class="text-danger small">
+                    <ValidationMessage For="@(() => newRecipe.Ingredients[index].Name)" />
+                    <ValidationMessage For="@(() => newRecipe.Ingredients[index].Quantity)" />
+                </div>
             }
 
         }
+        <ValidationMessage For="@(() => newRecipe.Ingredients)" />
         <button class="btn btn-outline-primary mb-3" type="button" @onclick="AddIngredient">+ Add Ingredient</button>
     </div>
 
@@ -64,8 +75,6 @@
             {
                 var index = i;
                 <div class="d-flex gap-2 mb-2 align-items-center">
-                    @* <InputNumber class="form-control" placeholder="Order"
-                               @bind-Value="newRecipe.Steps[index].Order" /> *@
                     <span class="input-group-text">Step @newRecipe.Steps[index].Order</span>
                     <InputText class="form-control" placeholder="Instruction"
                                @bind-Value="newRecipe.Steps[index].Instruction" />
@@ -74,10 +83,18 @@
                             @onclick="@(() => RemoveStep(index))">
                         –
                     </button>
+
                 </div>
+                <div class="text-danger small">
+                    <ValidationMessage For="@(() => newRecipe.Steps[index].Instruction)" />
+                </div>
+
+
             }
 
         }
+        <ValidationMessage For="@(() => newRecipe.Steps)" />
+
         <button class="btn btn-outline-primary mb-3" type="button" @onclick="AddStep">+ Add Step</button>
     </div>
     @* <div class="mb-3">

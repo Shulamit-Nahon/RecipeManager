@@ -30,7 +30,7 @@ else
                 </div>
                 <hr />
 
-                <h4>🧂 Ingredients</h4>
+                <h4>Ingredients</h4>
                 @if (recipe.Ingredients != null && recipe.Ingredients.Any())
                 {
                     <ul class="list-group list-group-flush mb-4">
@@ -47,7 +47,7 @@ else
                     <p class="text-muted">No ingredients listed.</p>
                 }
 
-                <h4>📋 Steps</h4>
+                <h4>Steps</h4>
                 @if (recipe.Steps != null && recipe.Steps.Any())
                 {
                     <ol class="list-group">
@@ -64,13 +64,14 @@ else
 
                 <div class="d-flex justify-content-center gap-3 my-4">
                     <a class="btn btn-sm btn-primary px-4 py-2 w-10" href="/edit-recipe/@recipe.Id">Edit Recipe</a>
-                    <button class="btn btn-sm btn-danger px-4 py-2 w-10" @onclick="()=>DeleteRecipe(recipe.Id)">Delete Recipe</button>
+                    <button class="btn btn-sm btn-danger px-4 py-2 w-10" @onclick="() => DeleteRecipe(recipe.Id)">Delete Recipe</button>
                 </div>
             </div>
         </div>
     </div>
-
-
+    <div class="d-flex justify-content-md-start gap-3 my-4">
+        <a class="btn btn-sm btn-primary px-4 py-2 w-10" href="/">Go Back</a>
+    </div>
 }
 
 @code {
