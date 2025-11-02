@@ -57,7 +57,7 @@ namespace RecipeFrontend.Services
             if (selectedImage != null)
             {
                 var stream = selectedImage.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
-                form.Add(new StreamContent(stream), "Image", selectedImage.Name);
+                form.Add(new StreamContent(stream), "File", selectedImage.Name);
             }
 
             var response = await _http.PostAsync("api/recipes", form);
